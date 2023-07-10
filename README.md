@@ -36,7 +36,7 @@ The service will start running on http://localhost:8080.
 - GET /status/:task_id - Get the status of a task with the given task ID along with its cursor position.
 
 
-###Contributing
+### Contributing
 
 Contributions are welcome! If you have any suggestions, bug reports, or feature requests, please open an issue or submit a pull request.
 
