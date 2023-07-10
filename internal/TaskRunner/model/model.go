@@ -14,9 +14,8 @@ type Task struct {
 
 var tasksMap map[string]*Task
 
-func InitInMemMap() map[string]*Task {
+func InitInMemMap() {
 	tasksMap = make(map[string]*Task)
-	return tasksMap
 }
 
 func AddToInMem(task *Task) {

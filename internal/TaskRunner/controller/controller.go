@@ -19,8 +19,8 @@ func (asj *AsyncJobController) StartJob(ctx *gin.Context) {
 	n, err := strconv.Atoi(nStr)
 	if err != nil || n <= 0 {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error":           "Failed to get Image by this ImageID",
-			"internal_error ": "Cat Image ID is not provided",
+			"error":           "Failed to get sleep time for this task",
+			"internal_error ": "Provided Sleep time is invalid",
 		})
 		return
 	}
@@ -28,7 +28,7 @@ func (asj *AsyncJobController) StartJob(ctx *gin.Context) {
 	statusCode, result, err := asj.AsynJobService.StartJobImpl(n)
 
 	if err != nil {
-		log.Println("Error while creating job ", err)
+		log.Println("Error while creating task ", err)
 		ctx.AbortWithStatusJSON(statusCode, result)
 	} else {
 		ctx.JSON(statusCode, result)
@@ -41,7 +41,7 @@ func (asj *AsyncJobController) PauseJob(ctx *gin.Context) {
 	statusCode, result, err := asj.AsynJobService.PauseJobImpl(taskID)
 
 	if err != nil {
-		log.Println("Error while pausing job ", err)
+		log.Println("Error while pausing task ", err)
 		ctx.AbortWithStatusJSON(statusCode, result)
 	} else {
 		ctx.JSON(statusCode, result)
@@ -54,7 +54,7 @@ func (asj *AsyncJobController) ResumeJob(ctx *gin.Context) {
 	statusCode, result, err := asj.AsynJobService.ResumeJobImpl(taskID)
 
 	if err != nil {
-		log.Println("Error while pausing job ", err)
+		log.Println("Error while resuming task ", err)
 		ctx.AbortWithStatusJSON(statusCode, result)
 	} else {
 		ctx.JSON(statusCode, result)
@@ -67,7 +67,7 @@ func (asj *AsyncJobController) TerminateJob(ctx *gin.Context) {
 	statusCode, result, err := asj.AsynJobService.TerminateJobImpl(taskID)
 
 	if err != nil {
-		log.Println("Error while pausing job ", err)
+		log.Println("Error while terminating task ", err)
 		ctx.AbortWithStatusJSON(statusCode, result)
 	} else {
 		ctx.JSON(statusCode, result)
@@ -77,10 +77,10 @@ func (asj *AsyncJobController) TerminateJob(ctx *gin.Context) {
 func (asj *AsyncJobController) StatusJob(ctx *gin.Context) {
 	taskID := ctx.Params.ByName("task_id")
 
-	statusCode, result, err := asj.AsynJobService.PauseJobImpl(taskID)
+	statusCode, result, err := asj.AsynJobService.JobStatusImpl(taskID)
 
 	if err != nil {
-		log.Println("Error while pausing job ", err)
+		log.Println("Error while fetching status of task ", err)
 		ctx.AbortWithStatusJSON(statusCode, result)
 	} else {
 		ctx.JSON(statusCode, result)

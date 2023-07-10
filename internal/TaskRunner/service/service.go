@@ -67,7 +67,7 @@ func (svc Service) PauseJobImpl(taskID string) (int, map[string]interface{}, err
 	return http.StatusOK, map[string]interface{}{
 		"task_ID":     task.ID,
 		"task_status": task.Status,
-		"success":     "Task added successfully",
+		"success":     "Task has been paused successfully",
 	}, nil
 }
 
@@ -92,20 +92,13 @@ func (svc Service) ResumeJobImpl(taskID string) (int, map[string]interface{}, er
 		}, fmt.Errorf("error")
 	}
 
-	if task.IsPaused {
-		return http.StatusBadRequest, map[string]interface{}{
-			"status_code": http.StatusBadRequest,
-			"error":       "Task is already paused",
-		}, fmt.Errorf("error")
-	}
-
 	task.IsPaused = false
 	task.Status = utils.JOB_RUNNING
 
 	return http.StatusOK, map[string]interface{}{
 		"task_ID":     task.ID,
 		"task_status": task.Status,
-		"success":     "Task restarted successfully",
+		"success":     "Task has been restarted successfully",
 	}, nil
 }
 
@@ -136,7 +129,7 @@ func (svc Service) TerminateJobImpl(taskID string) (int, map[string]interface{},
 	return http.StatusOK, map[string]interface{}{
 		"task_ID":     task.ID,
 		"task_status": task.Status,
-		"success":     "Task terminated successfully",
+		"success":     "Task has been terminated successfully",
 	}, nil
 }
 
@@ -157,7 +150,7 @@ func (svc Service) JobStatusImpl(taskID string) (int, map[string]interface{}, er
 	return http.StatusOK, map[string]interface{}{
 		"task_ID":     task.ID,
 		"task_status": task.Status,
-		"success":     "Task added successfully",
+		"success":     fmt.Sprintf("Task is in %s state", task.Status),
 	}, nil
 }
 
@@ -170,8 +163,7 @@ func runTask(task *model.Task) {
 		}
 		if task.IsPaused {
 			task.Mu.Unlock()
-			time.Sleep(time.Second)
-			continue
+			return
 		}
 		task.Cursor++
 		task.Mu.Unlock()

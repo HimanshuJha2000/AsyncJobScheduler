@@ -8,4 +8,6 @@ const (
 	JOB_PAUSED = "PAUSED"
 
 	JOB_COMPLETED = "COMPLETED"
+
+	GracefulTimeoutDuration = 5
 )
