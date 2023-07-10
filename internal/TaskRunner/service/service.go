@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/DevtronLabs/headoutProj/internal/TaskRunner/model"
 	"github.com/DevtronLabs/headoutProj/internal/utils"
 	"net/http"
@@ -12,7 +13,7 @@ type Service struct{}
 func (svc Service) StartJobImpl(sleepTime int) (int, map[string]interface{}, error) {
 	task := &model.Task{
 		ID:           utils.GenerateID(),
-		Status:       "RUNNING",
+		Status:       utils.JOB_RUNNING,
 		Cursor:       0,
 		Target:       sleepTime,
 		IsPaused:     false,
@@ -27,83 +28,136 @@ func (svc Service) StartJobImpl(sleepTime int) (int, map[string]interface{}, err
 		"task_ID":         task.ID,
 		"task_status":     task.Status,
 		"task_sleep_time": task.Target,
-		"success":         "Task added successfully",
+		"success":         "Task created and started successfully",
 	}, nil
 }
 
-func (svc Service) PauseJobImpl(taskID int) (int, map[string]interface{}, error) {
+func (svc Service) PauseJobImpl(taskID string) (int, map[string]interface{}, error) {
 
-	return http.StatusOK, map[string]interface{}{
-		"task_ID":         task.ID,
-		"task_status":     task.Status,
-		"task_sleep_time": task.Target,
-		"success":         "Task added successfully",
-	}, nil
-}
+	tasks := model.GetInMemMap()
+	task, ok := tasks[taskID]
 
-func (svc Service) ResumeJobImpl(sleepTime int) (int, map[string]interface{}, error) {
-	task := &model.Task{
-		ID:           utils.GenerateID(),
-		Status:       "RUNNING",
-		Cursor:       0,
-		Target:       sleepTime,
-		IsPaused:     false,
-		IsTerminated: false,
+	if !ok {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task doesn't exist",
+		}, fmt.Errorf("error")
 	}
 
-	go runTask(task)
+	task.Mu.Lock()
+	defer task.Mu.Unlock()
 
-	model.AddToInMem(task)
+	if task.IsTerminated {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task is already terminated",
+		}, fmt.Errorf("error")
+	}
+
+	if task.IsPaused {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task is already paused",
+		}, fmt.Errorf("error")
+	}
+
+	task.IsPaused = true
+	task.Status = utils.JOB_PAUSED
 
 	return http.StatusOK, map[string]interface{}{
-		"task_ID":         task.ID,
-		"task_status":     task.Status,
-		"task_sleep_time": task.Target,
-		"success":         "Task added successfully",
+		"task_ID":     task.ID,
+		"task_status": task.Status,
+		"success":     "Task added successfully",
 	}, nil
 }
 
-func (svc Service) TerminateJobImpl(sleepTime int) (int, map[string]interface{}, error) {
-	task := &model.Task{
-		ID:           utils.GenerateID(),
-		Status:       "RUNNING",
-		Cursor:       0,
-		Target:       sleepTime,
-		IsPaused:     false,
-		IsTerminated: false,
+func (svc Service) ResumeJobImpl(taskID string) (int, map[string]interface{}, error) {
+	tasks := model.GetInMemMap()
+	task, ok := tasks[taskID]
+
+	if !ok {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task doesn't exist",
+		}, fmt.Errorf("error occured")
 	}
 
-	go runTask(task)
+	task.Mu.Lock()
+	defer task.Mu.Unlock()
 
-	model.AddToInMem(task)
+	if task.IsTerminated {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task is already terminated",
+		}, fmt.Errorf("error")
+	}
+
+	if task.IsPaused {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task is already paused",
+		}, fmt.Errorf("error")
+	}
+
+	task.IsPaused = false
+	task.Status = utils.JOB_RUNNING
 
 	return http.StatusOK, map[string]interface{}{
-		"task_ID":         task.ID,
-		"task_status":     task.Status,
-		"task_sleep_time": task.Target,
-		"success":         "Task added successfully",
+		"task_ID":     task.ID,
+		"task_status": task.Status,
+		"success":     "Task restarted successfully",
 	}, nil
 }
 
-func (svc Service) TerminateJobImpl(sleepTime int) (int, map[string]interface{}, error) {
-	task := &model.Task{
-		ID:           utils.GenerateID(),
-		Status:       "RUNNING",
-		Cursor:       0,
-		Target:       sleepTime,
-		IsPaused:     false,
-		IsTerminated: false,
+func (svc Service) TerminateJobImpl(taskID string) (int, map[string]interface{}, error) {
+	tasks := model.GetInMemMap()
+	task, ok := tasks[taskID]
+
+	if !ok {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task doesn't exist",
+		}, fmt.Errorf("error occured")
 	}
 
-	go runTask(task)
+	task.Mu.Lock()
+	defer task.Mu.Unlock()
 
-	model.AddToInMem(task)
+	if task.IsTerminated {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task is already terminated",
+		}, fmt.Errorf("error")
+	}
+
+	task.IsTerminated = true
+	task.Status = utils.JOB_TERMINATED
 
 	return http.StatusOK, map[string]interface{}{
-		"task_ID":         task.ID,
-		"task_status":     task.Status,
-		"task_sleep_time": task.Target,
-		"success":         "Task added successfully",
+		"task_ID":     task.ID,
+		"task_status": task.Status,
+		"success":     "Task terminated successfully",
+	}, nil
+}
+
+func (svc Service) JobStatusImpl(taskID string) (int, map[string]interface{}, error) {
+	tasks := model.GetInMemMap()
+	task, ok := tasks[taskID]
+
+	if !ok {
+		return http.StatusBadRequest, map[string]interface{}{
+			"status_code": http.StatusBadRequest,
+			"error":       "Task doesn't exist",
+		}, fmt.Errorf("error occured")
+	}
+
+	task.Mu.Lock()
+	defer task.Mu.Unlock()
+
+	return http.StatusOK, map[string]interface{}{
+		"task_ID":     task.ID,
+		"task_status": task.Status,
+		"success":     "Task added successfully",
 	}, nil
 }
 
@@ -127,6 +181,6 @@ func runTask(task *model.Task) {
 	}
 
 	task.Mu.Lock()
-	task.Status = "COMPLETED"
+	task.Status = utils.JOB_COMPLETED
 	task.Mu.Unlock()
 }

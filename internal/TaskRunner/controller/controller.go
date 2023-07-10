@@ -38,16 +38,51 @@ func (asj *AsyncJobController) StartJob(ctx *gin.Context) {
 func (asj *AsyncJobController) PauseJob(ctx *gin.Context) {
 	taskID := ctx.Params.ByName("task_id")
 
+	statusCode, result, err := asj.AsynJobService.PauseJobImpl(taskID)
+
+	if err != nil {
+		log.Println("Error while pausing job ", err)
+		ctx.AbortWithStatusJSON(statusCode, result)
+	} else {
+		ctx.JSON(statusCode, result)
+	}
 }
 
 func (asj *AsyncJobController) ResumeJob(ctx *gin.Context) {
+	taskID := ctx.Params.ByName("task_id")
 
+	statusCode, result, err := asj.AsynJobService.ResumeJobImpl(taskID)
+
+	if err != nil {
+		log.Println("Error while pausing job ", err)
+		ctx.AbortWithStatusJSON(statusCode, result)
+	} else {
+		ctx.JSON(statusCode, result)
+	}
 }
 
 func (asj *AsyncJobController) TerminateJob(ctx *gin.Context) {
+	taskID := ctx.Params.ByName("task_id")
 
+	statusCode, result, err := asj.AsynJobService.TerminateJobImpl(taskID)
+
+	if err != nil {
+		log.Println("Error while pausing job ", err)
+		ctx.AbortWithStatusJSON(statusCode, result)
+	} else {
+		ctx.JSON(statusCode, result)
+	}
 }
 
 func (asj *AsyncJobController) StatusJob(ctx *gin.Context) {
+	taskID := ctx.Params.ByName("task_id")
 
+	statusCode, result, err := asj.AsynJobService.PauseJobImpl(taskID)
+
+	if err != nil {
+		log.Println("Error while pausing job ", err)
+		ctx.AbortWithStatusJSON(statusCode, result)
+	} else {
+		ctx.JSON(statusCode, result)
+	}
 }

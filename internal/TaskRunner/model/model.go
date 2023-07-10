@@ -23,6 +23,6 @@ func AddToInMem(task *Task) {
 	tasksMap[task.ID] = task
 }
 
-func GetMemMap() map[string]*Task {
+func GetInMemMap() map[string]*Task {
 	return tasksMap
 }
