@@ -40,6 +40,7 @@ The service will start running on http://localhost:8080.
 
 Contributions are welcome! If you have any suggestions, bug reports, or feature requests, please open an issue or submit a pull request.
 
-
+### Contact
+For any questions or inquiries, please contact at himanshu.jha1702@gmail.com.
 
    
