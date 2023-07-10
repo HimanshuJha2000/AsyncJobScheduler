@@ -29,11 +29,11 @@ The service will start running on http://localhost:8080.
 
 ### API Endpoints
 
-- POST /start?n=<target> - Start a new task with the specified target value (n).
-- PATCH /pause?id=<task_id> - Pause a running task with the given task ID.
-- PATCH /resume?id=<task_id> - Resume a paused task with the given task ID.
-- PATCH /terminate?id=<task_id> - Terminate a running task with the given task ID.
-- GET /status?id=<task_id> - Get the status of a task with the given task ID.
+- POST /create/:sleep_time - Start a new task with the specified sleep time(in seonds) value.
+- PATCH /pause/:task_id - Pause a running task with the given task ID.
+- PATCH /resume/:task_id - Resume a paused task with the given task ID.
+- PATCH /terminate/:task_id - Terminate a running task with the given task ID.
+- GET /status/:task_id - Get the status of a task with the given task ID along with its cursor position.
 
 
 ###Contributing
