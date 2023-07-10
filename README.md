@@ -22,7 +22,7 @@ This is a asynchronous task scheduler service implemented in Golang. It allows y
    git clone <repository_url>
    cd simple-task-management-service
    go build -o async_scheduler api/main.go
-    ./simple-task-management-service
+    ./AsyncJobScheduler
    ```
 
 The service will start running on http://localhost:8080.
